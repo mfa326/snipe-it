@@ -417,6 +417,56 @@ class NotebookFlowTest extends TestCase
         Storage::assertExists($first->path);
     }
 
+    public function test_meeting_preparation_preserves_history_and_starts_with_an_available_notebook(): void
+    {
+        config(['fiolux.demo_password' => 'TESTE-FIOLUX-senha-ficticia-123']);
+        Storage::fake('local');
+        $this->artisan('fiolux:prepare')->assertSuccessful();
+        $reference = \App\Models\Asset::where('asset_tag', 'TESTE FIOLUX NB-001')->firstOrFail();
+        $notebook = FioluxNotebook::where('asset_id', $reference->id)->firstOrFail();
+        $ti = User::where('username', 'teste_fiolux_ti')->firstOrFail();
+        $employee = User::where('username', 'teste_fiolux_a')->firstOrFail();
+        $original = $this->deliver($notebook, $ti, $employee);
+        $document = (new Documents)->generate($original, $ti);
+        $snapshot = $original->snapshot;
+        $bytes = Storage::get($document->path);
+
+        $this->artisan('fiolux:meeting')->assertSuccessful();
+        $this->artisan('fiolux:meeting')->assertSuccessful();
+
+        $demo = \App\Models\Asset::where('asset_tag', 'TESTE FIOLUX DEMO NB-001')->firstOrFail();
+        $this->assertTrue($demo->availableForCheckout());
+        $this->assertNotNull($demo->location_id);
+        $this->assertSame(0, FioluxCycle::where('asset_id', $demo->id)->count());
+        $this->assertSame(2, User::where('username', 'like', 'teste_fiolux_demo_001_%')->count());
+        $this->assertSame($snapshot, $original->fresh()->snapshot);
+        $this->assertSame($bytes, Storage::get($document->path));
+        $this->assertSame($employee->id, $reference->fresh()->assigned_to);
+        $this->assertDatabaseCount('fiolux_cycles', 1);
+    }
+
+    public function test_next_meeting_creates_a_fresh_kit_without_resetting_a_used_kit(): void
+    {
+        config(['fiolux.demo_password' => 'TESTE-FIOLUX-senha-ficticia-123']);
+        $this->artisan('fiolux:prepare')->assertSuccessful();
+        $this->artisan('fiolux:meeting')->assertSuccessful();
+        $first = \App\Models\Asset::where('asset_tag', 'TESTE FIOLUX DEMO NB-001')->firstOrFail();
+        $ti = User::where('username', 'teste_fiolux_ti')->firstOrFail();
+        $employee = User::where('username', 'teste_fiolux_demo_001_a')->firstOrFail();
+        $inspection = $this->deliver(FioluxNotebook::where('asset_id', $first->id)->firstOrFail(), $ti, $employee);
+
+        $this->artisan('fiolux:meeting')->assertSuccessful();
+        $this->artisan('fiolux:meeting', ['--next' => true])->assertSuccessful();
+
+        $second = \App\Models\Asset::where('asset_tag', 'TESTE FIOLUX DEMO NB-002')->firstOrFail();
+        $this->assertSame($employee->id, $first->fresh()->assigned_to);
+        $this->assertTrue($second->availableForCheckout());
+        $this->assertSame(0, FioluxCycle::where('asset_id', $second->id)->count());
+        $this->assertSame(2, User::where('username', 'like', 'teste_fiolux_demo_002_%')->count());
+        $this->assertModelExists($inspection);
+        $this->assertDatabaseCount('fiolux_cycles', 1);
+    }
+
     private function fixture(): array
     {
         config(['fiolux.template_version' => 'notebook-1']);
