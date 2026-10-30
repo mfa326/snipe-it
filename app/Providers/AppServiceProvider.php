@@ -83,6 +83,9 @@ class AppServiceProvider extends ServiceProvider
         View::composer('partials.impersonation-banner', ImpersonationBannerComposer::class);
 
         Schema::defaultStringLength(191);
+        if (config('fiolux.enabled')) {
+            \App\Actions\Fiolux\RegisterFioluxAction::run();
+        }
         Accessory::observe(AccessoryObserver::class);
         Asset::observe(AssetObserver::class);
         AssetModel::observe(AssetModelObserver::class);

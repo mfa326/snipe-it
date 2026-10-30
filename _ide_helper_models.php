@@ -3811,3 +3811,174 @@ namespace App\Models{
 	class IdeHelperUser {}
 }
 
+namespace App\Models{
+/**
+ * @property int $id
+ * @property int $asset_id
+ * @property int $user_id
+ * @property int|null $open_asset_id
+ * @property \Illuminate\Support\Carbon|null $returned_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Asset|null $asset
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FioluxDocument> $documents
+ * @property-read int|null $documents_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FioluxTechnicalEvaluation> $evaluations
+ * @property-read int|null $evaluations_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FioluxInspection> $inspections
+ * @property-read int|null $inspections_count
+ * @property-read \App\Models\User|null $user
+ * @method static \Database\Factories\FioluxCycleFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxCycle newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxCycle newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxCycle query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxCycle whereAssetId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxCycle whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxCycle whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxCycle whereOpenAssetId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxCycle whereReturnedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxCycle whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxCycle whereUserId($value)
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	class IdeHelperFioluxCycle {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property int $inspection_id
+ * @property int $cycle_id
+ * @property string $kind
+ * @property string $state
+ * @property string|null $path
+ * @property string|null $sha256
+ * @property string|null $mime
+ * @property int $operator_id
+ * @property int|null $checked_by
+ * @property \Illuminate\Support\Carbon|null $checked_at
+ * @property string|null $error
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\FioluxInspection|null $inspection
+ * @method static \Database\Factories\FioluxDocumentFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument whereCheckedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument whereCheckedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument whereCycleId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument whereError($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument whereInspectionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument whereKind($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument whereMime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument whereOperatorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument wherePath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument whereSha256($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument whereState($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxDocument whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	class IdeHelperFioluxDocument {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property int $cycle_id
+ * @property string $kind
+ * @property string $operation_key
+ * @property string $payload_hash
+ * @property int $operator_id
+ * @property int $actionlog_id
+ * @property string $template_version
+ * @property array<array-key, mixed> $snapshot
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\FioluxCycle|null $cycle
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FioluxDocument> $documents
+ * @property-read int|null $documents_count
+ * @method static \Database\Factories\FioluxInspectionFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxInspection newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxInspection newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxInspection query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxInspection whereActionlogId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxInspection whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxInspection whereCycleId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxInspection whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxInspection whereKind($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxInspection whereOperationKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxInspection whereOperatorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxInspection wherePayloadHash($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxInspection whereSnapshot($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxInspection whereTemplateVersion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxInspection whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	class IdeHelperFioluxInspection {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property int $asset_id
+ * @property int $available_status_id
+ * @property int $pending_status_id
+ * @property int|null $last_cycle_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Asset|null $asset
+ * @property-read \App\Models\FioluxCycle|null $lastCycle
+ * @method static \Database\Factories\FioluxNotebookFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxNotebook newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxNotebook newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxNotebook query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxNotebook whereAssetId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxNotebook whereAvailableStatusId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxNotebook whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxNotebook whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxNotebook whereLastCycleId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxNotebook wherePendingStatusId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxNotebook whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	class IdeHelperFioluxNotebook {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property int $cycle_id
+ * @property string $operation_key
+ * @property string $payload_hash
+ * @property int $operator_id
+ * @property array<array-key, mixed> $operator_snapshot
+ * @property string $result
+ * @property string $notes
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Database\Factories\FioluxTechnicalEvaluationFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxTechnicalEvaluation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxTechnicalEvaluation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxTechnicalEvaluation query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxTechnicalEvaluation whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxTechnicalEvaluation whereCycleId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxTechnicalEvaluation whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxTechnicalEvaluation whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxTechnicalEvaluation whereOperationKey($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxTechnicalEvaluation whereOperatorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxTechnicalEvaluation whereOperatorSnapshot($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxTechnicalEvaluation wherePayloadHash($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxTechnicalEvaluation whereResult($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FioluxTechnicalEvaluation whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	class IdeHelperFioluxTechnicalEvaluation {}
+}

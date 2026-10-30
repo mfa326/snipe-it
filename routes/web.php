@@ -48,6 +48,10 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Tabuna\Breadcrumbs\Trail;
 
+if (config('fiolux.enabled')) {
+    require __DIR__.'/web/fiolux.php';
+}
+
 /*
  * Gate Passport's default personal-access-token routes
  * behind the same self.api permission that protects Snipe-IT's own

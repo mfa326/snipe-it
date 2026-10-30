@@ -1361,6 +1361,9 @@ class AssetsController extends Controller
     {
         $this->authorize('checkout', Asset::class);
         $asset = Asset::findOrFail($asset_id);
+        if (config('fiolux.enabled')) {
+            app(\App\Services\Fiolux\MovementContext::class)->assertAllowed($asset);
+        }
 
         if (! $asset->availableForCheckout()) {
             return response()->json(Helper::formatStandardApiResponse('error', ['asset' => e($asset->asset_tag)], trans('admin/hardware/message.checkout.not_available')));
@@ -1475,6 +1478,9 @@ class AssetsController extends Controller
     {
         $asset = Asset::with('model')->findOrFail($asset_id);
         $this->authorize('checkin', $asset);
+        if (config('fiolux.enabled')) {
+            app(\App\Services\Fiolux\MovementContext::class)->assertAllowed($asset);
+        }
 
         // Concurrency guard.
         $outcome = DB::transaction(function () use ($asset, $request): array {

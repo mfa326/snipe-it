@@ -690,6 +690,9 @@ class Asset extends Depreciable
      */
     public function checkOut($target, $admin = null, $checkout_at = null, $expected_checkin = null, $note = null, $name = null, $location = null, bool $signInPlace = false)
     {
+        if (config('fiolux.enabled')) {
+            app(\App\Services\Fiolux\MovementContext::class)->assertAllowed($this);
+        }
         if (! $target) {
             return false;
         }

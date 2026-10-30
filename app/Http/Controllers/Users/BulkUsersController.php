@@ -418,6 +418,9 @@ class BulkUsersController extends Controller
 
         $users = User::whereIn('id', $user_raw_array)->get();
         $assets = Asset::whereIn('assigned_to', $user_raw_array)->where('assigned_type', User::class)->get();
+        if (config('fiolux.enabled') && \App\Models\FioluxNotebook::whereIn('asset_id', $assets->pluck('id'))->exists()) {
+            return redirect()->route('users.index')->with('error', trans('fiolux.use_flow'));
+        }
         $accessoryUserRows = DB::table('accessories_checkout')->where('assigned_type', User::class)->whereIn('assigned_to', $user_raw_array)->get();
         $licenses = DB::table('license_seats')->whereIn('assigned_to', $user_raw_array)->get();
         $consumableUserRows = DB::table('consumables_users')->whereIn('assigned_to', $user_raw_array)->get();
@@ -491,7 +494,7 @@ class BulkUsersController extends Controller
         $scopedAcceptanceIds = CheckoutAcceptance::pending()
             ->whereIn('assigned_to_id', $user_raw_array)
             ->get(['id', 'checkoutable_type', 'checkoutable_id'])
-            ->filter(fn($acceptance) => match ($acceptance->checkoutable_type) {
+            ->filter(fn ($acceptance) => match ($acceptance->checkoutable_type) {
                 Asset::class => $assets->pluck('id')->contains($acceptance->checkoutable_id),
                 Accessory::class => $scopedAccessoryUserRows->pluck('accessory_id')->contains($acceptance->checkoutable_id),
                 LicenseSeat::class => $scopedLicenseSeats->pluck('id')->contains($acceptance->checkoutable_id),
@@ -594,6 +597,9 @@ class BulkUsersController extends Controller
         // Get the users
         $merge_into_user = User::find($request->input('merge_into_id'));
         $users_to_merge = User::whereIn('id', $user_ids_to_merge)->with('assets', 'manager', 'userlog', 'licenses', 'consumables', 'accessories', 'managedLocations', 'uploads', 'acceptances')->get();
+        if (config('fiolux.enabled') && \App\Models\FioluxNotebook::whereIn('asset_id', $users_to_merge->flatMap(fn ($user) => $user->assets->pluck('id')))->exists()) {
+            return redirect()->route('users.index')->with('error', trans('fiolux.use_flow'));
+        }
         $admin = User::find(auth()->id());
 
         if (! auth()->user()->can('canEditAuthFields', $merge_into_user) || ! auth()->user()->can('editableOnDemo')) {
@@ -655,13 +661,13 @@ class BulkUsersController extends Controller
                 DB::table('company_user')
                     ->where('user_id', $user_to_merge->id)
                     ->pluck('company_id')
-                    ->map(fn($id) => (int) $id)
+                    ->map(fn ($id) => (int) $id)
                     ->all()
             );
             if (! empty($mergedCompanyIds)) {
                 $now = now();
                 DB::table('company_user')->insertOrIgnore(
-                    array_map(fn($companyId) => [
+                    array_map(fn ($companyId) => [
                         'company_id' => $companyId,
                         'user_id' => $merge_into_user->id,
                         'created_at' => $now,

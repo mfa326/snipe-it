@@ -34,6 +34,9 @@ class AssetCheckoutController extends Controller
      */
     public function create(Request $request, Asset $asset): View|RedirectResponse
     {
+        if (config('fiolux.enabled') && \App\Models\FioluxNotebook::where('asset_id', $asset->id)->exists()) {
+            return redirect()->route('fiolux.create', ['asset' => $asset->id]);
+        }
 
         $this->authorize('checkout', $asset);
 
@@ -98,6 +101,10 @@ class AssetCheckoutController extends Controller
                 return redirect()->route('hardware.index')->with('error', trans('admin/hardware/message.checkout.not_available'));
             }
             $this->authorize('checkout', $asset);
+
+            if (config('fiolux.enabled')) {
+                app(\App\Services\Fiolux\MovementContext::class)->assertAllowed($asset);
+            }
 
             if (! $asset->model) {
                 return redirect()->route('hardware.show', $asset)->with('error', trans('admin/hardware/general.model_invalid_fix'));

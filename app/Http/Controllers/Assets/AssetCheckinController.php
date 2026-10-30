@@ -31,6 +31,9 @@ class AssetCheckinController extends Controller
      */
     public function create(Asset $asset, $backto = null): View|RedirectResponse
     {
+        if (config('fiolux.enabled') && \App\Models\FioluxNotebook::where('asset_id', $asset->id)->exists()) {
+            return redirect()->route('fiolux.create', ['asset' => $asset->id, 'kind' => 'return']);
+        }
 
         $this->authorize('checkin', $asset);
 
@@ -109,6 +112,9 @@ class AssetCheckinController extends Controller
 
         $this->authorize('checkin', $asset);
 
+        if (config('fiolux.enabled')) {
+            app(\App\Services\Fiolux\MovementContext::class)->assertAllowed($asset);
+        }
         session()->put('checkedInFrom', $asset->assignedTo->id);
         session()->put('checkout_to_type', match ($asset->assigned_type) {
             'App\Models\User' => 'user',

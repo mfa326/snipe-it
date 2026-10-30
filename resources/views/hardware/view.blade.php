@@ -7,6 +7,11 @@
 @stop
 
 @section('header_right')
+    @if (config('fiolux.enabled'))
+        @can('viewAny', \App\Models\FioluxCycle::class)
+            <a class="btn btn-default" href="{{ route('fiolux.index', ['asset' => $asset->id]) }}">{{ trans('fiolux.title') }}</a>
+        @endcan
+    @endif
     <x-button.info-panel-toggle hide-on-xs/>
 @endsection
 
