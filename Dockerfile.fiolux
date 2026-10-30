@@ -1,0 +1,8 @@
+FROM snipe/snipe-it:v8.8.3@sha256:eb6d78c1bdae46d15177b149fcc14d7cd795d9f6c17e53dc4d87e04da9653218
+
+USER root
+WORKDIR /var/www/html
+COPY --chown=docker:staff composer.json composer.lock /var/www/html/
+RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+CMD ["/startup.sh"]

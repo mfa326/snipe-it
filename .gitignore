@@ -2,6 +2,10 @@
 .DS_Store
 .env
 .env.testing
+.poc-qa/
+/supervisord.pid
+/docs/referencias/
+/docs/DECISOES_POC_FIOLUX.md
 phpstan.neon
 .idea
 /bin/
@@ -96,3 +100,8 @@ storage/ldap_client_tls.key
 boost.json
 opencode.json
 /.ai/mcp
+
+# Local Fiolux reference documents and validation artifacts
+/docs/referencias/
+/docs/DECISOES_POC_FIOLUX.md
+/.poc-qa/

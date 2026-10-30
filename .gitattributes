@@ -1,3 +1,5 @@
 * text=auto
 public/js/** binary
 public/css/** binary
+docker/fiolux/*.sh text eol=lf
+artisan text eol=lf
