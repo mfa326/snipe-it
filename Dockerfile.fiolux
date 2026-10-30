@@ -2,7 +2,21 @@ FROM snipe/snipe-it:v8.8.3@sha256:eb6d78c1bdae46d15177b149fcc14d7cd795d9f6c17e53
 
 USER root
 WORKDIR /var/www/html
-COPY --chown=docker:staff composer.json composer.lock /var/www/html/
-RUN COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --prefer-dist --no-progress --no-scripts
-
-CMD ["/startup.sh"]
+ARG FIOLUX_REVISION=working-tree
+LABEL com.fiolux.source-revision=$FIOLUX_REVISION
+# O vendor e os assets compilados da mesma revisão oficial são preservados.
+COPY composer.json composer.lock /tmp/fiolux-dependencies/
+RUN php -r 'foreach (["composer.json", "composer.lock"] as $file) { if (json_decode(file_get_contents("/tmp/fiolux-dependencies/".$file), true) !== json_decode(file_get_contents("/var/www/html/".$file), true)) { fwrite(STDERR, "Dependencias diferentes da imagem-base: revise o build antes de continuar.\n"); exit(1); } }'
+COPY --chown=docker:staff app/ app/
+COPY --chown=docker:staff config/ config/
+COPY --chown=docker:staff database/ database/
+COPY --chown=docker:staff routes/ routes/
+COPY --chown=docker:staff resources/views/ resources/views/
+COPY --chown=docker:staff resources/lang/ resources/lang/
+COPY --chown=docker:staff public/fiolux-demo/ public/fiolux-demo/
+COPY docker/fiolux/startup.sh /usr/local/bin/fiolux-startup
+COPY docker/fiolux/backup.sh /var/www/html/docker/fiolux/backup.sh
+COPY docker/fiolux/php.ini /etc/php/8.3/apache2/conf.d/99-fiolux.ini
+RUN rm -f /var/www/html/.env \
+    && COMPOSER_ALLOW_SUPERUSER=1 composer dump-autoload --no-dev --optimize --no-scripts
+ENTRYPOINT ["/bin/sh", "/usr/local/bin/fiolux-startup"]

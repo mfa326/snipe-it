@@ -1,0 +1,56 @@
+name: teste-fiolux-snipeit-dev
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.fiolux.dev
+    image: teste-fiolux-snipeit:8.8.3-dev
+    entrypoint: ["/bin/sh", "/var/www/html/docker/fiolux/dev-startup.sh"]
+    env_file: .env
+    environment:
+      APP_URL: http://localhost:3042
+    ports:
+      - "127.0.0.1:3042:80"
+    volumes:
+      - .:/var/www/html
+      - vendor:/var/www/html/vendor
+      - storage:/var/www/html/storage
+      - data:/var/lib/snipeit
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--output", "/dev/null", "http://127.0.0.1/login"]
+      interval: 5s
+      timeout: 5s
+      start_period: 120s
+      retries: 40
+    networks: [frontend, isolated]
+
+  db:
+    image: mariadb:11.4.7@sha256:39596f079862334be04f4231664862e55d4febe54309cc62f750f2297de85b06
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_USER: ${DB_USERNAME}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - database:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    networks: [isolated]
+
+volumes:
+  database:
+  vendor:
+  storage:
+  data:
+
+networks:
+  frontend:
+  isolated:
+    internal: true

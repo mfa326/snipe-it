@@ -4,6 +4,8 @@ Esta prova estende o Snipe-IT 8.8.3 para validar conferências de notebook por c
 
 ## Preparar uma cópia nova
 
+Para o servidor, siga **[DEMONSTRACAO_FIOLUX.md](DEMONSTRACAO_FIOLUX.md)**: clone da branch e um script Bash que configura o ambiente e executa o Compose. O Compose principal agora constrói o código dentro da imagem, sem bind mount do checkout. O exemplo abaixo também permite inicializar pelo PowerShell no Windows.
+
 Requisitos: Git, Docker Desktop com containers Linux, Docker Compose e PowerShell 7.4 ou posterior. Não copiar banco, volumes, tokens ou configuração da instalação existente.
 
 ```powershell
@@ -12,12 +14,11 @@ cd snipe-it
 pwsh -NoProfile -File docker/fiolux/Initialize-Proof.ps1
 docker compose -f compose.fiolux.yml build app
 docker compose -f compose.fiolux.yml up -d --wait --wait-timeout 300
-docker compose -f compose.fiolux.yml exec -T --user docker app php artisan fiolux:prepare --demonstrate --no-interaction
 ```
 
-O startup executa as migrations reproduzíveis no banco dedicado. O comando `up --wait` aguarda o healthcheck HTTP antes da preparação dos dados; a primeira inicialização pode levar alguns minutos. O código fica montado do checkout; não remover a pasta enquanto usar a prova. A imagem contém as dependências de desenvolvimento do `composer.lock`, para executar testes, e não constitui uma imagem de produção.
+O startup executa migrations e prepara automaticamente o histórico fictício e um kit novo da reunião. O comando `up --wait` aguarda a prontidão HTTP. O código fica dentro da imagem construída a partir do Git; dependências e assets da revisão oficial são reutilizados, sem ferramentas de desenvolvimento no aplicativo da reunião. A preparação da demonstração não equivale à homologação para uso real.
 
-Acesso: http://localhost:3041/fiolux. Contas: `teste_fiolux_ti`, `teste_fiolux_rh`, `teste_fiolux_gestao` e `teste_fiolux_admin`. A senha fictícia de demonstração é gerada em `FIOLUX_DEMO_PASSWORD` no `.env` local e não é publicada. A e B são colaboradores fictícios sem login ativo. O comando de preparação preserva os registros já existentes; `--demonstrate` cria os dois ciclos somente se o notebook ainda não tiver ciclos.
+Acesso local: http://localhost:3041/fiolux-demo/. Contas: `teste_fiolux_ti`, `teste_fiolux_rh`, `teste_fiolux_gestao` e `teste_fiolux_admin`. A senha fictícia de demonstração é gerada em `FIOLUX_DEMO_PASSWORD` no `.env` local e não é publicada. A e B são colaboradores fictícios sem login ativo. A preparação preserva registros existentes; o kit da reunião começa sem ciclos e fica separado do notebook histórico.
 
 O inicializador recusa sobrescrever `.env` ou `.env.testing`. Guarde esses arquivos de forma protegida. A perda da chave `APP_KEY`, das chaves OAuth ou das credenciais pode impedir a recuperação correta do ambiente.
 
@@ -25,7 +26,7 @@ O inicializador recusa sobrescrever `.env` ou `.env.testing`. Guarde esses arqui
 
 Projeto Compose `teste-fiolux-snipeit`, banco `teste_fiolux_poc`, volumes próprios, porta HTTP limitada a `127.0.0.1:3041`. MariaDB não publica porta e utiliza rede interna. O aplicativo também possui uma rede de acesso local para publicar HTTP. Notificações usam mailer `array`; usuários fictícios não têm e-mail, webhooks ficam vazios e o startup próprio não inicia o agendador do produto. Não há credenciais da instalação existente.
 
-O recurso só é registrado com `FIOLUX_ENABLED=true`. Os ativos abrangidos são cadastrados na tabela própria `fiolux_notebooks`; a preparação inclui um único notebook. Não transformar o prefixo do nome em mecanismo de autorização ou identificação de ciclo.
+O recurso só é registrado com `FIOLUX_ENABLED=true`. Os ativos abrangidos são cadastrados na tabela própria `fiolux_notebooks`; a preparação inclui o notebook histórico e o notebook novo da reunião. Não transformar o prefixo do nome em mecanismo de autorização ou identificação de ciclo.
 
 Mantenha o recurso habilitado enquanto operar os notebooks abrangidos. Desabilitar a flag remove também os bloqueios do fluxo nativo; isso não desfaz registros e exige um plano de transição, não serve como rollback operacional.
 
@@ -41,13 +42,17 @@ Mantenha o recurso habilitado enquanto operar os notebooks abrangidos. Desabilit
 
 Conferências e avaliações concluídas não possuem edição ou exclusão. Rascunhos e interface de retificação ficam para uma etapa posterior; enquanto isso, não corrigir o histórico diretamente no banco. Os PDFs de exemplo são fictícios e não substituem um termo de responsabilidade validado pela empresa.
 
-Execute comandos que geram documentos com `--user docker`, o mesmo usuário do Apache. Isso evita que arquivos privados gerados por root fiquem ilegíveis para a aplicação. Após editar PHP ou views no checkout, reinicie apenas o container da prova para atualizar os caches do PHP.
+Execute comandos que geram documentos com `--user docker`, o mesmo usuário do Apache. Isso evita que arquivos privados gerados por root fiquem ilegíveis para a aplicação. Após editar o Git, execute `docker compose -f compose.fiolux.yml up -d --build --wait` para reconstruir e recriar a aplicação; reiniciar a imagem antiga não incorpora código novo.
 
 ## Testes
 
 ```powershell
+docker compose -f compose.fiolux.dev.yml build app
+docker compose -f compose.fiolux.dev.yml up -d --wait --wait-timeout 300
 pwsh -NoProfile -File docker/fiolux/Test-Proof.ps1
 ```
+
+O Compose de desenvolvimento usa outro projeto e volumes, na porta local 3042. Ele mantém bind mount e dependências de teste; o aplicativo otimizado da reunião não contém PHPUnit. O script cria `.env.testing` privado se estiver ausente.
 
 O script força o banco `teste_fiolux_tests`, separado da demonstração, e serializa suas próprias execuções. Não executar outras suítes PHPUnit simultaneamente no mesmo banco. Os testes usam MariaDB e o isolamento de `Tests\TestCase`. O produto representa erros de validação JSON com HTTP 200 e `status: error`; as verificações consideram o envelope e a ausência de gravações.
 
@@ -56,6 +61,7 @@ A suíte Fiolux é opcional quando o recurso está desativado, para preservar a 
 Para testar duas requisições simultâneas de entrega, após concluir e regularizar os ciclos anteriores:
 
 ```powershell
+docker compose -f compose.fiolux.dev.yml exec -T --user docker app php artisan fiolux:prepare --demonstrate --no-interaction
 pwsh -NoProfile -File docker/fiolux/Test-Concurrency.ps1
 ```
 

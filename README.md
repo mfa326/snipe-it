@@ -3,6 +3,10 @@
 [![Crowdin](https://d322cqt584bo4o.cloudfront.net/snipe-it/localized.svg)](https://crowdin.com/project/snipe-it) [![Docker Pulls](https://img.shields.io/docker/pulls/snipe/snipe-it.svg)](https://hub.docker.com/r/snipe/snipe-it/)  [![Tests in MySQL](https://github.com/grokability/snipe-it/actions/workflows/tests-mysql.yml/badge.svg)](https://github.com/grokability/snipe-it/actions/workflows/tests-mysql.yml)
 [![All Contributors](https://img.shields.io/badge/all_contributors-331-orange.svg?style=flat-square)](#contributing) [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/yZFtShAcKk)
 
+## Demonstração Fiolux
+
+Na branch `fiolux/poc-notebook`, siga o [guia de instalação e demonstração](docs/DEMONSTRACAO_FIOLUX.md): clone e execute `bash docker/fiolux/subir-demo.sh --url http://IP-DO-SERVIDOR:3041`. O script configura e sobe o Compose com dados fictícios, histórico preservado e um kit livre para a reunião. Não utilizar a configuração ou os dados da instalação real.
+
 ## Snipe-IT - Open Source Asset Management System
 
 This is a FOSS project for asset management in IT Operations. Knowing who has which laptop, when it was purchased in order to depreciate it correctly, handling software licenses, etc.

@@ -9,9 +9,16 @@ try {
     if (-not $hasMutex) { throw 'Já existe uma execução dos testes Fiolux. Aguarde sua conclusão.' }
     Push-Location $proofRoot
     try {
-        docker compose -f compose.fiolux.yml exec -T db sh -c 'export MYSQL_PWD="$MARIADB_ROOT_PASSWORD"; mariadb -uroot -e "CREATE DATABASE IF NOT EXISTS teste_fiolux_tests; GRANT ALL ON teste_fiolux_tests.* TO \"teste_fiolux\"@\"%\";"'
+        $testingPath = Join-Path $proofRoot '.env.testing'
+        if (-not (Test-Path -LiteralPath $testingPath)) {
+            $testingLines = Get-Content -LiteralPath (Join-Path $proofRoot '.env') | Where-Object { $_ -notmatch '^MYSQL_ROOT_PASSWORD=|^FIOLUX_DEMO_PASSWORD=' } | ForEach-Object {
+                $_ -replace '^APP_ENV=production$', 'APP_ENV=testing' -replace '^DB_DATABASE=teste_fiolux_poc$', 'DB_DATABASE=teste_fiolux_tests' -replace '^SESSION_DRIVER=file$', 'SESSION_DRIVER=array' -replace '^CACHE_DRIVER=file$', 'CACHE_DRIVER=array'
+            }
+            [IO.File]::WriteAllLines($testingPath, $testingLines, [Text.UTF8Encoding]::new($false))
+        }
+        docker compose -f compose.fiolux.dev.yml exec -T db sh -c 'export MYSQL_PWD="$MARIADB_ROOT_PASSWORD"; mariadb -uroot -e "CREATE DATABASE IF NOT EXISTS teste_fiolux_tests; GRANT ALL ON teste_fiolux_tests.* TO \"teste_fiolux\"@\"%\";"'
         if ($LASTEXITCODE -ne 0) { throw 'Não foi possível preparar o banco exclusivo de testes.' }
-        $testArguments = @('compose', '-f', 'compose.fiolux.yml', 'exec', '-T', '--user', 'docker', '-e', 'DB_DATABASE=teste_fiolux_tests', '-e', 'APP_ENV=testing', '-e', 'FIOLUX_ENABLED=true', 'app', 'php', 'vendor/bin/phpunit', 'tests/Feature/Fiolux', '--cache-directory', 'storage/framework/testing/phpunit-cache', '--testdox', '--log-junit', 'storage/logs/fiolux-tests.xml')
+        $testArguments = @('compose', '-f', 'compose.fiolux.dev.yml', 'exec', '-T', '--user', 'docker', '-e', 'DB_DATABASE=teste_fiolux_tests', '-e', 'APP_ENV=testing', '-e', 'FIOLUX_ENABLED=true', 'app', 'php', 'vendor/bin/phpunit', 'tests/Feature/Fiolux', '--cache-directory', 'storage/framework/testing/phpunit-cache', '--testdox', '--log-junit', 'storage/logs/fiolux-tests.xml')
         if ($Filter) { $testArguments += @('--filter', $Filter) }
         & docker @testArguments
         if ($LASTEXITCODE -ne 0) { throw 'Os testes Fiolux falharam. Consulte o resultado acima.' }

@@ -4,7 +4,7 @@ $proofRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
 Push-Location $proofRoot
 try {
     $workerPath = 'tests/Fixtures/Fiolux/concurrency-worker.php'
-    $beforeText = & docker compose -f compose.fiolux.yml exec -T app php $workerPath summary
+    $beforeText = & docker compose -f compose.fiolux.dev.yml exec -T app php $workerPath summary
     if ($LASTEXITCODE -ne 0) { throw 'Falha na pré-condição do teste concorrente.' }
     $before = $beforeText | ConvertFrom-Json
     if (-not $before.ready -or $null -ne $before.assigned_to) { throw 'Conclua o ciclo atual, a avaliação técnica e os documentos antes deste teste.' }
@@ -16,7 +16,7 @@ try {
         $startInfo.CreateNoWindow = $true
         $startInfo.RedirectStandardOutput = $true
         $startInfo.RedirectStandardError = $true
-        foreach ($argument in @('compose', '-f', 'compose.fiolux.yml', 'exec', '-T', 'app', 'php', $workerPath, 'checkout', $operationKey)) { $startInfo.ArgumentList.Add($argument) }
+        foreach ($argument in @('compose', '-f', 'compose.fiolux.dev.yml', 'exec', '-T', 'app', 'php', $workerPath, 'checkout', $operationKey)) { $startInfo.ArgumentList.Add($argument) }
         $process = [Diagnostics.Process]::new()
         $process.StartInfo = $startInfo
         [void]$process.Start()
@@ -31,7 +31,7 @@ try {
         $worker.Output.GetAwaiter().GetResult() | ConvertFrom-Json
         $worker.Process.Dispose()
     }
-    $afterText = & docker compose -f compose.fiolux.yml exec -T app php $workerPath summary
+    $afterText = & docker compose -f compose.fiolux.dev.yml exec -T app php $workerPath summary
     if ($LASTEXITCODE -ne 0) { throw 'Falha ao verificar o resultado.' }
     $after = $afterText | ConvertFrom-Json
     if ($results[0].inspection_id -ne $results[1].inspection_id -or $results[0].cycle_id -ne $results[1].cycle_id -or $after.cycles -ne ($before.cycles + 1) -or $after.inspections -ne ($before.inspections + 1) -or $after.checkouts -ne ($before.checkouts + 1)) {

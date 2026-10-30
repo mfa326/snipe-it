@@ -5,15 +5,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.fiolux
-    image: teste-fiolux-snipeit:8.8.3-poc
-    entrypoint: ["/bin/sh", "/var/www/html/docker/fiolux/startup.sh"]
+      args:
+        FIOLUX_REVISION: ${FIOLUX_REVISION:-working-tree}
+    image: teste-fiolux-snipeit:8.8.3-demo
+    restart: unless-stopped
     env_file: .env
+    environment:
+      APP_URL: ${APP_URL:?Configure APP_URL no .env}
+      FIOLUX_PREPARE_DEMO: "true"
     ports:
-      - "127.0.0.1:3041:80"
+      - "${FIOLUX_BIND:-127.0.0.1}:${FIOLUX_PORT:-3041}:80"
     volumes:
-      - .:/var/www/html
-      - vendor:/var/www/html/vendor
-      - storage:/var/www/html/storage
       - data:/var/lib/snipeit
     depends_on:
       db:
@@ -28,6 +30,7 @@ services:
 
   db:
     image: mariadb:11.4.7@sha256:39596f079862334be04f4231664862e55d4febe54309cc62f750f2297de85b06
+    restart: unless-stopped
     environment:
       MARIADB_DATABASE: ${DB_DATABASE}
       MARIADB_USER: ${DB_USERNAME}
@@ -44,8 +47,6 @@ services:
 
 volumes:
   database:
-  vendor:
-  storage:
   data:
 
 networks:

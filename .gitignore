@@ -105,3 +105,4 @@ opencode.json
 /docs/referencias/
 /docs/DECISOES_POC_FIOLUX.md
 /.poc-qa/
+/.env.fiolux.*

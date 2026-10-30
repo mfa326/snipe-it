@@ -26,7 +26,7 @@ O acesso está integrado às páginas do ativo e colaborador e aos fluxos de mov
 
 ## Evidências e resultados
 
-Rodada integral automatizada: **24 testes, 129 verificações, zero falhas e zero erros**, executada serialmente em MariaDB, com PHPUnit 11.5.55. O executor usa banco exclusivo e mutex; a própria classe recusa outro nome de banco antes de inicializar migrations. Essa recusa também foi exercitada com um nome sentinela inexistente. Após o ajuste final para tornar a suíte opcional, foram comprovados separadamente o estado desativado sem inicialização do banco e a execução habilitada pelo script (um teste, sete verificações).
+Rodada integral original: **24 testes, 129 verificações, zero falhas e zero erros**, executada serialmente em MariaDB, com PHPUnit 11.5.55. Na preparação da reunião, a suíte foi ampliada e passou com **26 testes e 150 verificações**, incluindo preservação do histórico e criação de kit seguinte sem reiniciar o anterior. O executor usa banco exclusivo e mutex; a própria classe recusa outro nome de banco antes de inicializar migrations. Essa recusa também foi exercitada com um nome sentinela inexistente. A suíte permanece opcional quando o recurso está desativado.
 
 | Situação | Cenário | Evidência / limite |
 |---|---|---|
@@ -83,6 +83,7 @@ A execução inicial revelou falta das chaves locais do Passport para testar a A
 | `.gitignore` | Excluir referências internas e artefatos locais. |
 | `.dockerignore` | Excluir configurações e documentos internos do contexto de build. |
 | `.gitattributes` | Fixar LF nos scripts shell da prova e no launcher Artisan. |
+| `README.md` | Atalho para instalação da demonstração a partir do Git. |
 
 Código restante em arquivos novos identificados por `Fiolux`, subpastas `fiolux` e infraestrutura própria. `composer.json` e `composer.lock` não foram alterados; nenhum arquivo de `vendor` foi editado. O gerador upstream de IDE helper pode atualizar stubs durante migrations com dependências de desenvolvimento: revisar essas alterações antes de um commit, sem aceitar mudanças incidentais no esquema tipado original.
 
@@ -109,3 +110,13 @@ Essa recomendação é condicionada: há alterações em caminhos centrais de mo
 Os bloqueios também dependem de `FIOLUX_ENABLED=true`; desligar essa configuração não é rollback dos ciclos existentes. Uma transição de operação exige planejamento para preservar a relação com as alocações.
 
 Instalação, operação, backup e procedimento para futuras atualizações: `docs/EXECUCAO_POC_FIOLUX.md`. O ensaio de atualização deverá usar branch e ambiente descartáveis quando houver release candidata; não foi simulada compatibilidade com uma versão futura inexistente.
+
+## Preparação da reunião e configuração otimizada
+
+A entrega posterior do roteiro foi atendida com um kit `TESTE FIOLUX DEMO NB-001` sem ciclos, colaboradores A/B exclusivos, localização fictícia e quatro imagens de assinatura simulada. Os três ciclos anteriores da base local foram preservados. O roteiro recebido permanece em `docs/referencias`, fora do fork público. A preparação não pré-executa as movimentações que os participantes deverão demonstrar.
+
+O Compose principal passou a construir o código dentro da imagem, sem bind mount do checkout, vendor ou caches do Windows. Reutiliza dependências de execução da revisão oficial, verifica a correspondência dos arquivos Composer, habilita OPcache e prepara caches. O ambiente com ferramentas de desenvolvimento foi separado em `compose.fiolux.dev.yml`.
+
+Foram comprovados: geração de configuração nova sem expor senhas, reexecução sem sobrescrever a configuração, recusa de configuração alheia e primeira instalação em banco/volumes vazios, incluindo dois ciclos históricos com documentos e um kit livre. Na configuração local otimizada, cinco requisições de login retornaram HTTP 200 entre 0,30 e 0,39 segundo. Não foi obtida uma medição comparável anterior, pois os containers anteriores já não existiam; esses valores não representam benchmark do servidor.
+
+O Pint com `--dirty --format agent` também concluiu com sucesso nesta entrega. Instruções atuais: `docs/DEMONSTRACAO_FIOLUX.md`. Retificação, exceções, devolução posterior do carregador e as demais pendências de homologação permanecem com o escopo já registrado.

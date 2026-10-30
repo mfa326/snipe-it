@@ -12,6 +12,7 @@ node_modules
 .idea
 .env
 .env.testing
+.env.*
 docs/referencias
 docs/DECISOES_POC_FIOLUX.md
 .poc-qa
