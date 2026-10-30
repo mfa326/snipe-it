@@ -23,6 +23,9 @@ class NotebookFlowTest extends TestCase
 {
     protected function setUp(): void
     {
+        if (! filter_var(getenv('FIOLUX_ENABLED'), FILTER_VALIDATE_BOOL)) {
+            $this->markTestSkipped('Suíte opcional Fiolux. Use Test-Proof.ps1 para habilitar no banco isolado.');
+        }
         if (getenv('DB_DATABASE') !== 'teste_fiolux_tests') {
             throw new \RuntimeException('Suíte Fiolux exige DB_DATABASE=teste_fiolux_tests antes de inicializar o banco. Use Test-Proof.ps1.');
         }
